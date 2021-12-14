@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Test on node ${{ matrix.node-version }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16]
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Docker pull google/cloud-sdk:latest
+        run: docker pull --quiet google/cloud-sdk:latest
+        if: runner.os == 'Linux'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+
+      - name: Use gcloud CLI
+        run: gcloud info
+
+      - name: Update GCloud Components
+        run: gcloud components update --quiet
+
+      - name: Install GCloud beta
+        run: gcloud components install beta --quiet
+
+      - name: Install cloud-datastore-emulator
+        run: gcloud components install cloud-datastore-emulator --quiet
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run test
+        run: npm test
