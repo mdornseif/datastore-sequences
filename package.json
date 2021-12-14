@@ -1,6 +1,6 @@
 {
   "name": "datastore-sequences",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Generate sequential counters for Google Clound Datastore.",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
