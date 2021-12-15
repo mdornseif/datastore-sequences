@@ -48,9 +48,11 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@google-cloud/datastore": "^6.6.2",
     "p-limit": "^3.1.0",
     "p-retry": "^4.6.1"
+  },
+  "peerDependencies": {
+    "@google-cloud/datastore": "^6.6.2"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
