@@ -5,45 +5,45 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [12.x, 16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-    - name: Docker pull google/cloud-sdk:latest
-      run: docker pull --quiet google/cloud-sdk:latest
-      if: runner.os == 'Linux'
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@master
+      # - name: Docker pull google/cloud-sdk:latest
+      #   run: docker pull --quiet google/cloud-sdk:latest
+      #   if: runner.os == 'Linux'
 
-    - name: Use gcloud CLI
-      run: gcloud info
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
 
-    - name: Update GCloud Components
-      run: gcloud components update --quiet
+      - name: Use gcloud CLI
+        run: gcloud info
 
-    - name: Install GCloud beta
-      run: gcloud components install beta --quiet
+      # - name: Update GCloud Components
+      #   run: gcloud components update --quiet
 
-    - name: Install cloud-datastore-emulator
-      run: gcloud components install cloud-datastore-emulator --quiet
-      
-    - run: yarn install
-    - run: yarn test
+      - name: Install GCloud beta
+        run: gcloud components install beta --quiet
+
+      - name: Install cloud-datastore-emulator
+        run: gcloud components install cloud-datastore-emulator --quiet
+
+      - run: yarn install
+      - run: yarn test
