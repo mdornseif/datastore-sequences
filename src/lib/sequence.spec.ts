@@ -17,10 +17,8 @@ process.env.CLOUDSDK_CORE_DISABLE_PROMPTS = '1 ';
 let emulator;
 
 test.before(async (_t) => {
-  emulator = new Emulator({ useDocker: false, debug: true });
-  console.log('starting');
+  emulator = new Emulator({ useDocker: false, debug: false });
   await emulator.start();
-  console.log('started');
 });
 
 test('numbering', async (t) => {
