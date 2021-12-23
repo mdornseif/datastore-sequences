@@ -5,8 +5,11 @@
 
 import { Datastore, Transaction } from '@google-cloud/datastore';
 import DatastoreEntity from '@google-cloud/datastore/build/src/entity';
+import Debug from 'debug';
 import pLimit from 'p-limit';
 import pRetry from 'p-retry';
+
+const debug = Debug('sequences');
 
 // Max Concurrency of 1 promise at once
 const limit = pLimit(1);
@@ -68,10 +71,10 @@ export class SequenceNumbering {
     prefix: string,
     initialId: number
   ): Promise<string> {
-    return await limit(() => this.allocateIdOnceUnlimited(prefix, initialId));
+    return await limit(() => this._allocateIdOnceUnlimited(prefix, initialId));
   }
 
-  async allocateIdOnceUnlimited(
+  async _allocateIdOnceUnlimited(
     prefix: string,
     initialId: number
   ): Promise<string> {
@@ -86,19 +89,21 @@ export class SequenceNumbering {
       initialId
     );
     const designator = `${prefix}${newId}`;
+    debug('new Designator:%s id:%s', designator, newId);
     const itemKey = this.datastore.key([
       this.ancestorKindName,
       prefix,
       this.itemKindName,
       designator,
     ]);
+
     // Dupes really should not happen, but better save than sorry
     await this.preventDupe(transaction, itemKey);
 
     transaction.upsert([
       {
         key: ancestorKey,
-        data: { ...ancestor, lastId: newId },
+        data: { ...ancestor, lastId: newId, updated_at: new Date() },
       },
     ]);
     transaction.insert([
@@ -116,6 +121,7 @@ export class SequenceNumbering {
     itemKey: DatastoreEntity.entity.Key
   ): Promise<void> {
     const [datastoreItem] = await transaction.get(itemKey);
+    debug('found (undefined is good): %o', datastoreItem);
     // const itemQuery = transaction.createQuery('NumberingItem')
     // itemQuery.filter('__key__', itemKey)
     // const [data] = await transaction.runQuery(itemQuery)
@@ -140,9 +146,11 @@ export class SequenceNumbering {
     let ancestor;
 
     if (!data || data.length === 0) {
-      ancestor = { prefix, lastId: initialId - 1 };
+      ancestor = { prefix, lastId: initialId - 1, created_at: new Date() };
+      debug('no ancestor, starting with %o', ancestor);
     } else {
-      ancestor = data[0];
+      ancestor = data;
+      debug('using existing ancestor %o', ancestor);
     }
     return [Number(ancestor?.lastId ?? 0) + 1, ancestor];
   }

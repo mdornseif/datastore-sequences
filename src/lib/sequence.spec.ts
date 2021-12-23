@@ -23,9 +23,18 @@ test.before(async (_t) => {
 
 test('numbering', async (t) => {
   const numbering = new SequenceNumbering(new Datastore());
-  const newId = await numbering.allocateId('TST', 10_000);
-
+  let newId = await numbering.allocateId('TST', 10_000);
+  t.log('bla');
   t.deepEqual(newId, 'TST10000');
+  newId = await numbering.allocateId('TST', 10_000);
+  t.deepEqual(newId, 'TST10001');
+  newId = await numbering.allocateId('TST', 10_000);
+  t.deepEqual(newId, 'TST10002');
+  newId = await numbering.allocateId('TST');
+  t.deepEqual(newId, 'TST10003');
+
+  newId = await numbering.allocateId('TEST');
+  t.deepEqual(newId, 'TEST1');
 });
 
 test.after('cleanup', async (_t) => {
