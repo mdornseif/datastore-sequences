@@ -56,7 +56,7 @@
     "@google-cloud/datastore": "^6.6.2"
   },
   "devDependencies": {
-    "@ava/typescript": "^1.1.1",
+    "@ava/typescript": "3.0.1",
     "@google-cloud/datastore": "^6.6.2",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/node": "^16.11.13",
