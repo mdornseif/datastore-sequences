@@ -1,11 +1,8 @@
-[![Build Status](https://img.shields.io/travis/mdornseif/datastore-sequences.svg?style=flat-square&color=%23007a1f)](https://travis-ci.org/mdornseif/datastore-sequences)
-[![version](https://img.shields.io/npm/v/datastore-sequences.svg?style=flat-square)](https://npmjs.org/datastore-sequences)
-[![NPM Types](https://img.shields.ionpm/types/datastore-sequences)](https://www.npmjs.com/package/datastore-sequences)
+[![version](https://img.shields.io/npm/v/datastore-sequences.svg)](https://npmjs.org/datastore-sequences)
+[![NPM Types](https://img.shields.io/npm/types/datastore-sequences)](https://www.npmjs.com/package/datastore-sequences)
 [![Last Commit](https://img.shields.io/github/last-commit/mdornseif/datastore-sequences)](https://github.com/mdornseif/datastore-sequences)
-[![min size](https://img.shields.io/bundlephobia/min/datastore-sequences?style=flat-square)](https://bundlephobia.com/result?p=datastore-sequences)
-[![mingzip size](https://img.shields.io/bundlephobia/minzip/datastore-sequences)](https://bundlephobia.com/result?p=datastore-sequences)
-[![license](https://img.shields.io/npm/l/datastore-sequences?color=%23007a1f&style=flat-square)](https://github.com/mdornseif/datastore-sequences/blob/master/LICENSE)
-[![downloads](https://img.shields.io/npm/dm/datastore-sequences?style=flat-square&color=%23007a1f)](https://npmcharts.com/compare/datastore-sequences)
+[![license](https://img.shields.io/npm/l/datastore-sequences?color=%23007a1f)](https://github.com/mdornseif/datastore-sequences/blob/master/LICENSE)
+[![downloads](https://img.shields.io/npm/dm/datastore-sequences?&color=%23007a1f)](https://npmcharts.com/compare/datastore-sequences)
 
 # datastore-sequences
 
@@ -30,3 +27,7 @@ const newId = await numbering.allocateId();
 ```
 
 This automatically reties getting a new number on datastore congestion and tries to serialize number generation to avoid datastore congestion.
+
+# See also
+
+- [Simplified Datastore API](https://www.npmjs.com/package/datastore-api)
