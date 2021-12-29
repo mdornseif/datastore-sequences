@@ -21,20 +21,51 @@ test.before(async (_t) => {
   await emulator.start();
 });
 
-test('numbering', async (t) => {
+test('numbering without prefix', async (t) => {
+  const numbering = new SequenceNumbering(new Datastore());
+  const newId = await numbering.allocateId();
+  t.deepEqual(newId, '1');
+});
+
+test('numbering with prefix', async (t) => {
   const numbering = new SequenceNumbering(new Datastore());
   let newId = await numbering.allocateId('TST', 10_000);
-  t.log('bla');
   t.deepEqual(newId, 'TST10000');
-  newId = await numbering.allocateId('TST', 10_000);
-  t.deepEqual(newId, 'TST10001');
-  newId = await numbering.allocateId('TST', 10_000);
-  t.deepEqual(newId, 'TST10002');
-  newId = await numbering.allocateId('TST');
-  t.deepEqual(newId, 'TST10003');
-
   newId = await numbering.allocateId('TEST');
   t.deepEqual(newId, 'TEST1');
+});
+
+test('numbering repeated', async (t) => {
+  const numbering = new SequenceNumbering(new Datastore());
+  let newId = await numbering.allocateId('TST2_', 10_000);
+  t.log('bla');
+  t.deepEqual(newId, 'TST2_10000');
+  newId = await numbering.allocateId('TST2_', 10_000);
+  t.deepEqual(newId, 'TST2_10001');
+  newId = await numbering.allocateId('TST2_', 10_000);
+  t.deepEqual(newId, 'TST2_10002');
+  newId = await numbering.allocateId('TST2_');
+  t.deepEqual(newId, 'TST2_10003');
+});
+
+test('numbering parallel', async (t) => {
+  const numbering = new SequenceNumbering(new Datastore());
+  const ids = await Promise.all([
+    numbering.allocateId('TST3_', 10_000),
+    numbering.allocateId('TST3_', 10_000),
+    numbering.allocateId('TST3_', 10_000),
+    numbering.allocateId('TST3_', 10_000),
+    numbering.allocateId('TST3_', 10_000),
+    numbering.allocateId('TEST3_'),
+  ]);
+  t.deepEqual(ids, [
+    'TST3_10000',
+    'TST3_10001',
+    'TST3_10002',
+    'TST3_10003',
+    'TST3_10004',
+    'TEST3_1',
+  ]);
 });
 
 test.after('cleanup', async (_t) => {

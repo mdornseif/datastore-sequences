@@ -9,7 +9,7 @@ import Debug from 'debug';
 import pLimit from 'p-limit';
 import pRetry from 'p-retry';
 
-const debug = Debug('sequences');
+const debug = Debug('ds:sequences');
 
 // Max Concurrency of 1 promise at once
 const limit = pLimit(1);
@@ -81,7 +81,10 @@ export class SequenceNumbering {
     const transaction = this.datastore.transaction();
     await transaction.run();
 
-    const ancestorKey = this.datastore.key([this.ancestorKindName, prefix]);
+    const ancestorKey = this.datastore.key([
+      this.ancestorKindName,
+      prefix != '' ? prefix : '(empty)',
+    ]);
     const [newId, ancestor] = await this.getNewId(
       transaction,
       ancestorKey,
@@ -92,7 +95,7 @@ export class SequenceNumbering {
     debug('new Designator:%s id:%s', designator, newId);
     const itemKey = this.datastore.key([
       this.ancestorKindName,
-      prefix,
+      prefix != '' ? prefix : '(empty)',
       this.itemKindName,
       designator,
     ]);
