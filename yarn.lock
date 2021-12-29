@@ -1894,9 +1894,9 @@ dargs@^7.0.0:
   integrity sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==
 
 datastore-api@^1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/datastore-api/-/datastore-api-1.1.1.tgz#0f66516db14d2ff458e4569d4f905ed95105ea85"
-  integrity sha512-vIR+0I3SvQMXyp5mRV+qwY6iR1Het2dlOuYY87IZ92jN818W/QLhtSYaigEshmaUe6zgkR/rzfAuLFWgpUsAJg==
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/datastore-api/-/datastore-api-1.1.2.tgz#c4c5e2a32d4ad3e09a6bc2a81c52960274581d3a"
+  integrity sha512-Wu005Abk5pzOKIYuZlPvpJK7mDJ/N2KZaKYxhpL71qPb2znrntMiK0oDq28BcNSCMwGUoExBB4/VysEipZTOOQ==
   dependencies:
     assertate "^2.4.0"
 

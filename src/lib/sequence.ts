@@ -3,8 +3,8 @@
  * Copyright 2020, 2021 Maximillian Dornseif
  */
 
-import { Datastore, Transaction } from '@google-cloud/datastore';
-import DatastoreEntity from '@google-cloud/datastore/build/src/entity';
+import { assertIsString } from 'assertate-debug';
+import { Datastore, Dstore, IDstoreEntry, Key } from 'datastore-api';
 import Debug from 'debug';
 import pLimit from 'p-limit';
 import pRetry from 'p-retry';
@@ -44,12 +44,14 @@ This automatically reties getting a new number and tries to serialize number gen
 export class SequenceNumbering {
   ancestorKindName: string;
   itemKindName: string;
+  dstore: Dstore;
   constructor(
     readonly datastore = new Datastore(),
     readonly kindNamePrefix = 'Numbering'
   ) {
     this.ancestorKindName = `${kindNamePrefix}Ancestor`;
     this.itemKindName = `${kindNamePrefix}Item`;
+    this.dstore = new Dstore(this.datastore, process.env.GCLOUD_PROJECT);
   }
 
   /** The workhorse, generating a new unique ID for a certain Sequence.
@@ -61,10 +63,15 @@ export class SequenceNumbering {
   async allocateId(prefix = '', initialId = 1): Promise<string> {
     const run = async (): Promise<string> =>
       await this.allocateSequenceIdOnce(prefix, initialId);
-    return await pRetry(run, {
-      maxRetryTime: 5000,
-      randomize: true,
-    });
+    try {
+      return await pRetry(run, {
+        maxRetryTime: 10000,
+        randomize: true,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new error();
+    }
   }
 
   async allocateSequenceIdOnce(
@@ -78,74 +85,74 @@ export class SequenceNumbering {
     prefix: string,
     initialId: number
   ): Promise<string> {
-    const transaction = this.datastore.transaction();
-    await transaction.run();
+    let designator;
 
-    const ancestorKey = this.datastore.key([
+    const ancestorKey = this.dstore.key([
       this.ancestorKindName,
       prefix != '' ? prefix : '(empty)',
     ]);
-    const [newId, ancestor] = await this.getNewId(
-      transaction,
-      ancestorKey,
-      prefix,
-      initialId
-    );
-    const designator = `${prefix}${newId}`;
-    debug('new Designator:%s id:%s', designator, newId);
-    const itemKey = this.datastore.key([
-      this.ancestorKindName,
-      prefix != '' ? prefix : '(empty)',
-      this.itemKindName,
-      designator,
-    ]);
+    const txn = async () => {
+      const [newId, ancestor] = await this.getNewId(
+        ancestorKey,
+        prefix,
+        initialId
+      );
+      designator = `${prefix}${newId}`;
+      debug('new Designator:%s id:%s', designator, newId);
+      const itemKey = this.dstore.key([
+        this.ancestorKindName,
+        prefix != '' ? prefix : '(empty)',
+        this.itemKindName,
+        designator,
+      ]);
 
-    // Dupes really should not happen, but better save than sorry
-    await this.preventDupe(transaction, itemKey);
+      // Dupes really should not happen, but better safe than sorry
+      await this.preventDupe(itemKey);
 
-    transaction.upsert([
-      {
-        key: ancestorKey,
-        data: { ...ancestor, lastId: newId, updated_at: new Date() },
-      },
-    ]);
-    transaction.insert([
-      {
-        key: itemKey,
-        data: { id: newId, designator },
-      },
-    ]);
-    await transaction.commit();
+      this.dstore.save([
+        {
+          key: ancestorKey,
+          data: { ...ancestor, lastId: newId, updated_at: new Date() },
+        },
+      ]);
+      this.dstore.insert([
+        {
+          key: itemKey,
+          data: { id: newId, designator },
+        },
+      ]);
+    };
+    await this.dstore.runInTransaction(txn);
+    assertIsString(designator);
     return designator;
   }
 
-  private async preventDupe(
-    transaction: Transaction,
-    itemKey: DatastoreEntity.entity.Key
-  ): Promise<void> {
-    const [datastoreItem] = await transaction.get(itemKey);
+  private async preventDupe(itemKey: Key): Promise<void> {
+    const datastoreItem = await this.dstore.get(itemKey);
     debug('found (undefined is good): %o', datastoreItem);
     // const itemQuery = transaction.createQuery('NumberingItem')
     // itemQuery.filter('__key__', itemKey)
     // const [data] = await transaction.runQuery(itemQuery)
     // const [datastoreItem] = data
-    if (datastoreItem && itemKey === datastoreItem[this.datastore.KEY]) {
-      // The entity already exists.
-      await transaction.rollback();
+    if (
+      datastoreItem &&
+      JSON.stringify(itemKey.path) ==
+        JSON.stringify(datastoreItem[Datastore.KEY].path)
+    ) {
+      // The entity already exists: rollback
       throw new Error(`Duplicate entity ${JSON.stringify(itemKey)}`);
     }
   }
 
   async getNewId(
-    transaction: Transaction,
-    ancestorKey: DatastoreEntity.entity.Key,
+    ancestorKey: Key,
     prefix: string,
     initialId: number
-  ): Promise<[number, DatastoreEntity.Entity]> {
+  ): Promise<[number, IDstoreEntry]> {
     // const ancestorQuery = transaction.createQuery(this.ancestorKindName)
     // ancestorQuery.filter('__key__', ancestorKey)
     // const [data] = await transaction.runQuery(ancestorQuery)
-    const [data] = await transaction.get(ancestorKey);
+    const data = await this.dstore.get(ancestorKey);
     let ancestor;
 
     if (!data || data.length === 0) {
