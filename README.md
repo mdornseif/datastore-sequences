@@ -23,10 +23,37 @@ To use it, you instantiate with a [@google-cloud/datastore](https://github.com/g
 import { Datastore } from '@google-cloud/datastore';
 import { SequenceNumbering } from 'datastore-sequences';
 const numbering = new SequenceNumbering(new Datastore());
-const newId = await numbering.allocateId();
+const newId1 = await numbering.allocateId();
+const newId2 = await numbering.allocateId();
+console.log(newId1, newId2)
+'1' '2'
 ```
 
 This automatically reties getting a new number on datastore congestion and tries to serialize number generation to avoid datastore congestion.
+
+You can give a prefix to get different namespaces:
+
+```js
+const newIds = await Promise.all([
+  numbering.allocateId('RG'),
+  numbering.allocateId('LS'),
+  numbering.allocateId('RG'),
+  numbering.allocateId('LS')])
+console.log(newIds);
+['RG1' 'LS1', 'RG2', 'LS2']
+```
+
+You are also encouraged to give a starting value.
+This is only needed on the first run for a given Prefix:
+
+```js
+const newIds = await Promise.all([
+  numbering.allocateId('RG', 10000),
+  numbering.allocateId('RG'),
+]);
+console.log(newIds);
+[('RG10001', 'RG10002')];
+```
 
 # See also
 
