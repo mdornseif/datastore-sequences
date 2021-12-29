@@ -998,6 +998,16 @@ asn1@^0.2.4:
   dependencies:
     safer-buffer "~2.1.0"
 
+assertate-debug@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/assertate-debug/-/assertate-debug-2.4.2.tgz#4a9c85f4d699e11d24cdc2e60da9a8aab3380dea"
+  integrity sha512-6wnmcJLJNwR3DbV3tV4IJcBz9ye2SUYgrDM2BVHx/CUE9p2iJsAxxusXmR3lKoqCkaEi9242u3jDImoDg8ksrQ==
+
+assertate@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/assertate/-/assertate-2.4.0.tgz#625b0b1c54c4a01fbe8059268ac4d3fdb653d272"
+  integrity sha512-t3+jNfAgLrKLAq7ftFC6QCB7vBZMvmwGtUXqaq5C3b+9Agv5B84usnDORLwcV98HtKXyKaoU2/hNuRd2ZSX6dQ==
+
 astral-regex@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/astral-regex/-/astral-regex-2.0.0.tgz#483143c567aeed4785759c0865786dc77d7d2e31"
@@ -1882,6 +1892,13 @@ dargs@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/dargs/-/dargs-7.0.0.tgz#04015c41de0bcb69ec84050f3d9be0caf8d6d5cc"
   integrity sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==
+
+datastore-api@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/datastore-api/-/datastore-api-1.1.1.tgz#0f66516db14d2ff458e4569d4f905ed95105ea85"
+  integrity sha512-vIR+0I3SvQMXyp5mRV+qwY6iR1Het2dlOuYY87IZ92jN818W/QLhtSYaigEshmaUe6zgkR/rzfAuLFWgpUsAJg==
+  dependencies:
+    assertate "^2.4.0"
 
 date-time@^3.1.0:
   version "3.1.0"
