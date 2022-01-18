@@ -61,7 +61,7 @@
     "@ava/typescript": "^1.1.1",
     "@google-cloud/datastore": "^6.6.2",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/node": "^16.11.13",
+    "@types/node": "16.11.21",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
     "ava": "^3.12.1",
