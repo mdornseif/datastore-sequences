@@ -27,6 +27,7 @@
     "sandboxed",
     "transpiled",
     "typedoc",
+    "vitest",
     "untracked",
     "upsert"
   ],
