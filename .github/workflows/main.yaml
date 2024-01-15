@@ -46,11 +46,11 @@ jobs:
       # - name: Lint 🔍
       #   run: npm run lint
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud for Tests 🔓'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY_RWTEST }}
+      # - id: 'auth'
+      #   name: 'Authenticate to Google Cloud for Tests 🔓'
+      #   uses: 'google-github-actions/auth@v1'
+      #   with:
+      #     credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY_RWTEST }}
       - uses: 'google-github-actions/setup-gcloud@v1'
       - name: Install GCloud beta 📦
         shell: bash
