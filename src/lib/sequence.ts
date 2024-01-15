@@ -139,7 +139,9 @@ export class SequenceNumbering {
       JSON.stringify(itemKey.path) ==
         JSON.stringify(datastoreItem[Datastore.KEY].path)
     ) {
+      debug('`Duplicate entity %o', JSON.stringify(itemKey));
       // The entity already exists: rollback
+      // await transaction.rollback();
       throw new Error(`Duplicate entity ${JSON.stringify(itemKey)}`);
     }
   }
