@@ -2,17 +2,26 @@
   "name": "datastore-sequences",
   "version": "1.0.6",
   "description": "Generate sequential counters for Google Clound Datastore.",
-  "main": "build/main/index.js",
-  "typings": "build/main/index.d.ts",
-  "module": "build/module/index.js",
-  "repository": "https://github.com/mdornseif/datastore-sequences",
-  "license": "MIT",
   "keywords": [
     "google api",
     "google cloud platform",
     "google cloud",
     "google datastore",
     "datastore"
+  ],
+  "repository": "https://github.com/mdornseif/datastore-sequences",
+  "license": "MIT",
+  "main": "build/main/index.js",
+  "module": "build/module/index.js",
+  "typings": "build/main/index.d.ts",
+  "files": [
+    "build/main",
+    "build/module",
+    "!**/*.spec.*",
+    "!**/*.json",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
   ],
   "scripts": {
     "build": "run-p build:*",
@@ -38,10 +47,34 @@
     "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
     "version": "standard-version",
     "reset-hard": "git clean -dfx && git reset --hard && npm install",
-    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish"
+    "prepare-release": "run-s reset-hard test cov:check doc:html version doc:publish",
+    "prepare": "husky install"
   },
-  "engines": {
-    "node": ">=10"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*{css,scss,md,markdown,json,yaml,yml,graphql,html}": "npx prettier -w",
+    "*{js,jsx,ts,tsx}": [
+      "npx prettier -w",
+      "npm run lint --fix"
+    ],
+    "package.json": "sort-package-json"
+  },
+  "prettier": {
+    "printWidth": 110,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "release": {
+    "branches": [
+      "main",
+      "master",
+      "next"
+    ]
   },
   "dependencies": {
     "assertate-debug": ">=2.4.2",
@@ -49,9 +82,6 @@
     "debug": ">=4.3.3",
     "p-limit": "^3.1.0",
     "p-retry": "^4.6.1"
-  },
-  "peerDependencies": {
-    "@google-cloud/datastore": ">=6.0.0"
   },
   "devDependencies": {
     "@google-cloud/datastore": ">=6.0.0",
@@ -67,6 +97,8 @@
     "eslint-plugin-import": "^2.22.0",
     "gh-pages": "^3.1.0",
     "google-datastore-emulator": ">=5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.0",
     "npm-run-all": "^4.1.5",
     "open-cli": "^8.0.0",
     "prettier": "^2.1.1",
@@ -77,16 +109,10 @@
     "typescript": "<5.1.0",
     "vitest": "^1.2.0"
   },
-  "files": [
-    "build/main",
-    "build/module",
-    "!**/*.spec.*",
-    "!**/*.json",
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md"
-  ],
-  "prettier": {
-    "singleQuote": true
+  "peerDependencies": {
+    "@google-cloud/datastore": ">=6.0.0"
+  },
+  "engines": {
+    "node": ">=10"
   }
 }
