@@ -45,5 +45,5 @@ jobs:
       - name: Install cloud-datastore-emulator
         run: gcloud components install cloud-datastore-emulator --quiet
 
-      - run: npm run install
+      - run: npm install
       - run: npm run test
