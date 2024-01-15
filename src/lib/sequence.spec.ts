@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /*
- * sequence.spec.ts
+ * sequence.spec.ts Tests against the Google Datastore Emulator
  *
  * Created by Dr. Maximillian Dornseif 2021-12-14 in datastore-sequences 1.0.0
- * Copyright (c) 2021 Dr. Maximillian Dornseif GmbH
+ * Copyright (c) 2021, 2024 Dr. Maximillian Dornseif
  */
 
 import { Datastore } from '@google-cloud/datastore';
-import test from 'ava';
+import { test, beforeAll, afterAll, expect } from 'vitest';
 import Emulator from 'google-datastore-emulator';
 
 import { SequenceNumbering } from './sequence';
@@ -16,39 +16,42 @@ process.env.GCLOUD_PROJECT = 'project-id'; // Set the datastore project Id globa
 process.env.CLOUDSDK_CORE_DISABLE_PROMPTS = '1 ';
 let emulator;
 
-test.before(async (_t) => {
+beforeAll(async () => {
   emulator = new Emulator({ useDocker: false, debug: false });
   await emulator.start();
 });
 
-test('numbering without prefix', async (t) => {
+afterAll(async () => {
+  await emulator.stop();
+});
+
+test('numbering without prefix', async () => {
   const numbering = new SequenceNumbering(new Datastore());
   const newId = await numbering.allocateId();
-  t.deepEqual(newId, '1');
+  expect(newId).toBe('1');
 });
 
-test('numbering with prefix', async (t) => {
+test('numbering with prefix', async () => {
   const numbering = new SequenceNumbering(new Datastore());
   let newId = await numbering.allocateId('TST', 10_000);
-  t.deepEqual(newId, 'TST10000');
+  expect(newId).toBe('TST10000');
   newId = await numbering.allocateId('TEST');
-  t.deepEqual(newId, 'TEST1');
+  expect(newId).toBe('TEST1');
 });
 
-test('numbering repeated', async (t) => {
+test('numbering repeated', async () => {
   const numbering = new SequenceNumbering(new Datastore());
   let newId = await numbering.allocateId('TST2_', 10_000);
-  t.log('bla');
-  t.deepEqual(newId, 'TST2_10000');
+  expect(newId).toBe('TST2_10000');
   newId = await numbering.allocateId('TST2_', 10_000);
-  t.deepEqual(newId, 'TST2_10001');
+  expect(newId).toBe('TST2_10001');
   newId = await numbering.allocateId('TST2_', 10_000);
-  t.deepEqual(newId, 'TST2_10002');
+  expect(newId).toBe('TST2_10002');
   newId = await numbering.allocateId('TST2_');
-  t.deepEqual(newId, 'TST2_10003');
+  expect(newId).toBe('TST2_10003');
 });
 
-test('numbering parallel', async (t) => {
+test('numbering parallel', async () => {
   const numbering = new SequenceNumbering(new Datastore());
   const ids = await Promise.all([
     numbering.allocateId('TST3_', 10_000),
@@ -57,17 +60,15 @@ test('numbering parallel', async (t) => {
     numbering.allocateId('TST3_', 10_000),
     numbering.allocateId('TST3_', 10_000),
     numbering.allocateId('TEST3_'),
+    numbering.allocateId('TEST3_'),
   ]);
-  t.deepEqual(ids, [
+  expect(ids).toEqual([
     'TST3_10000',
     'TST3_10001',
     'TST3_10002',
     'TST3_10003',
     'TST3_10004',
     'TEST3_1',
+    'TEST3_2',
   ]);
-});
-
-test.after('cleanup', async (_t) => {
-  await emulator.stop();
 });
