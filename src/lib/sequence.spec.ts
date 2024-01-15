@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
  * sequence.spec.ts Tests against the Google Datastore Emulator
  *
@@ -7,8 +6,8 @@
  */
 
 import { Datastore } from '@google-cloud/datastore';
-import { test, beforeAll, afterAll, expect } from 'vitest';
 import Emulator from 'google-datastore-emulator';
+import { afterAll, beforeAll, expect, test } from 'vitest';
 
 import { SequenceNumbering } from './sequence';
 
