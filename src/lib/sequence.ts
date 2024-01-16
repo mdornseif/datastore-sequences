@@ -45,10 +45,7 @@ export class SequenceNumbering {
   ancestorKindName: string;
   itemKindName: string;
   dstore: Dstore;
-  constructor(
-    readonly datastore = new Datastore(),
-    readonly kindNamePrefix = 'Numbering'
-  ) {
+  constructor(readonly datastore = new Datastore(), readonly kindNamePrefix = 'Numbering') {
     this.ancestorKindName = `${kindNamePrefix}Ancestor`;
     this.itemKindName = `${kindNamePrefix}Item`;
     this.dstore = new Dstore(this.datastore, process.env.GCLOUD_PROJECT);
@@ -61,8 +58,7 @@ export class SequenceNumbering {
     Contains serialized Access within a single Node Process and automatic retires up to 5 Seconds.
    */
   async allocateId(prefix = '', initialId = 1): Promise<string> {
-    const run = async (): Promise<string> =>
-      await this.allocateSequenceIdOnce(prefix, initialId);
+    const run = async (): Promise<string> => await this.allocateSequenceIdOnce(prefix, initialId);
     try {
       return await pRetry(run, {
         maxRetryTime: 10000,
@@ -74,29 +70,16 @@ export class SequenceNumbering {
     }
   }
 
-  async allocateSequenceIdOnce(
-    prefix: string,
-    initialId: number
-  ): Promise<string> {
+  async allocateSequenceIdOnce(prefix: string, initialId: number): Promise<string> {
     return await limit(() => this._allocateIdOnceUnlimited(prefix, initialId));
   }
 
-  async _allocateIdOnceUnlimited(
-    prefix: string,
-    initialId: number
-  ): Promise<string> {
+  async _allocateIdOnceUnlimited(prefix: string, initialId: number): Promise<string> {
     let designator;
 
-    const ancestorKey = this.dstore.key([
-      this.ancestorKindName,
-      prefix != '' ? prefix : '(empty)',
-    ]);
+    const ancestorKey = this.dstore.key([this.ancestorKindName, prefix != '' ? prefix : '(empty)']);
     const txn = async () => {
-      const [newId, ancestor] = await this.getNewId(
-        ancestorKey,
-        prefix,
-        initialId
-      );
+      const [newId, ancestor] = await this.getNewId(ancestorKey, prefix, initialId);
       designator = `${prefix}${newId}`;
       debug('new Designator:%s id:%s', designator, newId);
       const itemKey = this.dstore.key([
@@ -134,11 +117,7 @@ export class SequenceNumbering {
     // itemQuery.filter('__key__', itemKey)
     // const [data] = await transaction.runQuery(itemQuery)
     // const [datastoreItem] = data
-    if (
-      datastoreItem &&
-      JSON.stringify(itemKey.path) ==
-        JSON.stringify(datastoreItem[Datastore.KEY].path)
-    ) {
+    if (datastoreItem && JSON.stringify(itemKey.path) == JSON.stringify(datastoreItem[Datastore.KEY].path)) {
       debug('`Duplicate entity %o', JSON.stringify(itemKey));
       // The entity already exists: rollback
       // await transaction.rollback();
@@ -146,11 +125,7 @@ export class SequenceNumbering {
     }
   }
 
-  async getNewId(
-    ancestorKey: Key,
-    prefix: string,
-    initialId: number
-  ): Promise<[number, IDstoreEntry]> {
+  async getNewId(ancestorKey: Key, prefix: string, initialId: number): Promise<[number, IDstoreEntry]> {
     // const ancestorQuery = transaction.createQuery(this.ancestorKindName)
     // ancestorQuery.filter('__key__', ancestorKey)
     // const [data] = await transaction.runQuery(ancestorQuery)
